@@ -4,6 +4,10 @@ import pandas as pd
 mouse_data = pd.read_csv('./data/Mouse_metadata.csv')
 study_results = pd.read_csv('./data/Study_results.csv')
 
+print(mouse_data.head())
+print(study_results.head())
+study_results.set_index(['Mouse ID'])
+print(study_results.head())
 
 regimens = mouse_data['Drug Regimen'].unique()
 
@@ -21,9 +25,7 @@ regimens = pd.DataFrame(mouse_data['Drug Regimen'].unique())
 regimen_data = mouse_data.groupby(['Drug Regimen']).mean()
 regimen_data['# of subjects'] = mouse_data['Drug Regimen'].value_counts()
 regimen_data = regimen_data.reset_index()
-
-
-bar_chart_data = regimen_data.drop(columns=['Age_months','Weight (g)', 'Volume'])
+print(mouse_data.head())
 
 tumor_data_stdev = tumor_data.groupby(['Drug Regimen']).std()
 
@@ -31,10 +33,17 @@ tumor_data_stdev = tumor_data.groupby(['Drug Regimen']).std()
 stdevs = []
 for value in range(10):
     stdevs.append(tumor_data_stdev['Volume'][value])
-
+chart_mouse_id = 's185'
 
 
 regimen_data['stdev'] = stdevs
+
+bar_chart_data = regimen_data.drop(columns=['Age_months','Weight (g)', 'Volume'])
+capomulin_data = mouse_data[mouse_data['Drug Regimen'] == 'Capomulin']
+line_chart_data = study_results[study_results['Mouse ID'] == chart_mouse_id]
+line_chart_x = line_chart_data['Timepoint']
+line_chart_y = line_chart_data['Tumor Volume (mm3)']
+print(line_chart_data.head())
 
 fig, a = plt.subplots(2,2)
 sex_counts = mouse_data['Sex'].value_counts()
@@ -50,4 +59,13 @@ a[0][1].set_title('Sex breakdown')
 
 a[1][1] = bar_chart_data.plot(kind='bar')
 
-print(regimen_data)
+fig = plt.figure()
+ax = plt.axes()
+
+ax.plot(line_chart_x,line_chart_y)
+ax.set_title('Tumor volume over time in S185', fontsize = 20)
+ax.set_xlabel('Timepoint')
+ax.set_ylabel('Tumor Volume (mm3)')
+plt.show()
+
+ax.set_title('Tumor Volume over time in Subject S185 (Capomulin)')
