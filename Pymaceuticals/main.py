@@ -40,10 +40,15 @@ regimen_data['stdev'] = stdevs
 
 bar_chart_data = regimen_data.drop(columns=['Age_months','Weight (g)', 'Volume'])
 capomulin_data = mouse_data[mouse_data['Drug Regimen'] == 'Capomulin']
+
 line_chart_data = study_results[study_results['Mouse ID'] == chart_mouse_id]
 line_chart_x = line_chart_data['Timepoint']
 line_chart_y = line_chart_data['Tumor Volume (mm3)']
-print(line_chart_data.head())
+
+scatter_data = capomulin_data.groupby(['Mouse ID']).mean()
+scatter_data = scatter_data.reset_index()
+scatter_x = scatter_data['Weight (g)']
+scatter_y = scatter_data['Volume']
 
 fig, a = plt.subplots(2,2)
 sex_counts = mouse_data['Sex'].value_counts()
@@ -60,12 +65,21 @@ a[0][1].set_title('Sex breakdown')
 a[1][1] = bar_chart_data.plot(kind='bar')
 
 fig = plt.figure()
-ax = plt.axes()
+line_chart = fig.add_subplot(1,1,1)
+line_chart.plot(line_chart_x,line_chart_y,marker='o',)
+line_chart.set_title('Tumor volume over time in S185', fontsize = 20)
+line_chart.set_xlabel('Timepoint')
+line_chart.set_ylabel('Tumor Volume (mm3)')
+line_chart.set_title('Tumor Volume over time in Subject S185 (Capomulin)')
 
-ax.plot(line_chart_x,line_chart_y)
-ax.set_title('Tumor volume over time in S185', fontsize = 20)
-ax.set_xlabel('Timepoint')
-ax.set_ylabel('Tumor Volume (mm3)')
+fig2 = plt.figure()
+scatter_chart = fig2.add_subplot(1,1,1)
+scatter_chart.scatter(scatter_x, scatter_y)
+scatter_chart.set_title('Mouse Weight vs. Tumor Volume')
+scatter_chart.set_xlabel('Weight (g)')
+scatter_chart.set_ylabel('Volume (mm3)')
 plt.show()
 
-ax.set_title('Tumor Volume over time in Subject S185 (Capomulin)')
+
+
+
