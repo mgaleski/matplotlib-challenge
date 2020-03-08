@@ -11,7 +11,6 @@ tumors = {}
 tumors['Mouse ID'] = study_results['Mouse ID']
 tumors['Volume'] = study_results['Tumor Volume (mm3)']
 tumors = pd.DataFrame(tumors)
-print(study_results)
 
 mouse_data = mouse_data.set_index('Mouse ID').join(tumors.set_index('Mouse ID'))
 mouse_data = mouse_data.reset_index()
@@ -26,17 +25,20 @@ regimen_data = regimen_data.reset_index()
 
 bar_chart_data = regimen_data.drop(columns=['Age_months','Weight (g)', 'Volume'])
 
-tumor_data = tumor_data.groupby(['Drug Regimen']).std()
-print(tumor_data)
-
-print(tumor_data.groupby('Drug Regimen'))
+tumor_data_stdev = tumor_data.groupby(['Drug Regimen']).std()
 
 
-sex_counts = mouse_data['Sex'].value_counts()
-pie_labels = ['Male', 'Female']
+stdevs = []
+for value in range(10):
+    stdevs.append(tumor_data_stdev['Volume'][value])
 
+
+
+regimen_data['stdev'] = stdevs
 
 fig, a = plt.subplots(2,2)
+sex_counts = mouse_data['Sex'].value_counts()
+pie_labels = ['Male', 'Female']
 
 a[0][0].bar(bar_chart_data['Drug Regimen'], bar_chart_data['# of subjects'])
 a[0][0].set_xlabel('Drug Regimen')
@@ -48,6 +50,4 @@ a[0][1].set_title('Sex breakdown')
 
 a[1][1] = bar_chart_data.plot(kind='bar')
 
-
-
-plt.show()
+print(regimen_data)
